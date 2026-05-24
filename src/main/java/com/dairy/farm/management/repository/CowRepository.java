@@ -29,4 +29,10 @@ public interface CowRepository
     findByCowNameAndOwnerOwnerName(
             String cowName,
             String ownerName);
+
+    /*
+     * Count cows by owner id.
+     */
+    Long countByOwnerId(Long ownerId);
+
 }

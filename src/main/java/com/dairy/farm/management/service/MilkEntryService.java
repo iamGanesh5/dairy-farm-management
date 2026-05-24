@@ -12,6 +12,8 @@ import com.dairy.farm.management.repository.MilkEntryRepository;
 import com.dairy.farm.management.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.dairy.farm.management.dto.OwnerDashboardSummaryDTO;
+import com.dairy.farm.management.entity.Owner;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -367,5 +369,70 @@ public class MilkEntryService {
                 .totalMilk(totalMilk)
                 .totalRevenue(totalRevenue)
                 .build();
+    }
+
+    /*
+     * Fetch owner dashboard summary.
+     */
+    public OwnerDashboardSummaryDTO
+    getOwnerDashboardSummary(
+            Long ownerId
+    ) {
+
+        Owner owner = ownerRepository
+                .findById(ownerId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Owner not found"
+                        ));
+
+        Long totalCows =
+                cowRepository.countByOwnerId(
+                        ownerId
+                );
+
+        Double todayMilk =
+                milkEntryRepository.getTodayMilk(
+                        ownerId,
+                        LocalDate.now()
+                );
+
+        Double monthlyMilk =
+                milkEntryRepository.getMonthlyMilk(
+                        ownerId,
+                        LocalDate.now().getMonthValue(),
+                        LocalDate.now().getYear()
+                );
+
+        Double yearlyMilk =
+                milkEntryRepository.getYearlyMilk(
+                        ownerId,
+                        LocalDate.now().getYear()
+                );
+
+        Double monthlyRevenue =
+                milkEntryRepository.getMonthlyRevenue(
+                        ownerId,
+                        LocalDate.now().getMonthValue(),
+                        LocalDate.now().getYear()
+                );
+
+        Double yearlyRevenue =
+                milkEntryRepository.getYearlyRevenue(
+                        ownerId,
+                        LocalDate.now().getYear()
+                );
+
+        return OwnerDashboardSummaryDTO
+                .builder()
+                .ownerName(owner.getOwnerName())
+                .totalCows(totalCows)
+                .todayMilk(todayMilk)
+                .monthlyMilk(monthlyMilk)
+                .yearlyMilk(yearlyMilk)
+                .monthlyRevenue(monthlyRevenue)
+                .yearlyRevenue(yearlyRevenue)
+                .build();
+
     }
 }

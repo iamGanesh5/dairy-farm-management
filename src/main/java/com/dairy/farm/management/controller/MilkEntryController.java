@@ -1,9 +1,6 @@
 package com.dairy.farm.management.controller;
 
-import com.dairy.farm.management.dto.DashboardSummaryDTO;
-import com.dairy.farm.management.dto.MilkEntryRequestDTO;
-import com.dairy.farm.management.dto.MonthlyOwnerMilkReportDTO;
-import com.dairy.farm.management.dto.OwnerSummaryDTO;
+import com.dairy.farm.management.dto.*;
 import com.dairy.farm.management.entity.MilkEntry;
 import com.dairy.farm.management.service.MilkEntryService;
 import lombok.RequiredArgsConstructor;
@@ -177,5 +174,24 @@ public class MilkEntryController {
 
         return milkEntryService
                 .getDashboardSummary();
+    }
+
+
+    @GetMapping(
+            "/owner-dashboard/{ownerId}"
+    )
+    public OwnerDashboardSummaryDTO
+    getOwnerDashboardSummary(
+
+            @PathVariable
+            Long ownerId
+
+    ) {
+
+        return milkEntryService
+                .getOwnerDashboardSummary(
+                        ownerId
+                );
+
     }
 }
