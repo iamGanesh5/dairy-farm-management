@@ -27,8 +27,10 @@ public class Owner {
     /*
      * Owner name.
      */
-    @Column(name = "owner_name",
-            nullable = false)
+    @Column(
+            name = "owner_name",
+            nullable = false
+    )
     private String ownerName;
 
     /*
@@ -38,19 +40,31 @@ public class Owner {
     private String mobileNumber;
 
     /*
+     * Owner address.
+     */
+    @Column(name = "address")
+    private String address;
+
+    /*
      * One owner can have multiple cows.
      */
-    @OneToMany(mappedBy = "owner",
-            cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "owner",
+            cascade = CascadeType.ALL
+    )
     @JsonIgnore
     private List<Cow> cows;
 
-    @Column(name = "created_at",
-            updatable = false)
+    @Column(
+            name = "created_at",
+            updatable = false
+    )
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
+
         this.createdAt = LocalDateTime.now();
+
     }
 }

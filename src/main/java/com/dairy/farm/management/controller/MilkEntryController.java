@@ -1,5 +1,6 @@
 package com.dairy.farm.management.controller;
 
+import com.dairy.farm.management.dto.DashboardSummaryDTO;
 import com.dairy.farm.management.dto.MilkEntryRequestDTO;
 import com.dairy.farm.management.dto.MonthlyOwnerMilkReportDTO;
 import com.dairy.farm.management.dto.OwnerSummaryDTO;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/milk-entries")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class MilkEntryController {
 
     private final MilkEntryService milkEntryService;
@@ -168,5 +170,12 @@ public class MilkEntryController {
                         ownerName,
                         startDate,
                         endDate);
+    }
+    @GetMapping("/dashboard-summary")
+    public DashboardSummaryDTO
+    getDashboardSummary() {
+
+        return milkEntryService
+                .getDashboardSummary();
     }
 }

@@ -1,5 +1,6 @@
 package com.dairy.farm.management.service;
 
+import com.dairy.farm.management.dto.DashboardSummaryDTO;
 import com.dairy.farm.management.dto.MilkEntryRequestDTO;
 import com.dairy.farm.management.dto.MonthlyOwnerMilkReportDTO;
 import com.dairy.farm.management.dto.OwnerSummaryDTO;
@@ -8,6 +9,7 @@ import com.dairy.farm.management.entity.MilkEntry;
 import com.dairy.farm.management.exception.ResourceNotFoundException;
 import com.dairy.farm.management.repository.CowRepository;
 import com.dairy.farm.management.repository.MilkEntryRepository;
+import com.dairy.farm.management.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,10 @@ import java.util.stream.Collectors;
 public class MilkEntryService {
 
     private final MilkEntryRepository milkEntryRepository;
+
     private final CowRepository cowRepository;
+
+    private final OwnerRepository ownerRepository;
 
     /*
      * Add daily milk entry
@@ -36,17 +41,14 @@ public class MilkEntryService {
             Long cowId,
             MilkEntry milkEntry) {
 
-        // Fetch cow details
         Cow cow = cowRepository.findById(cowId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Cow not found with id : "
                                         + cowId));
 
-        // Set cow object
         milkEntry.setCow(cow);
 
-        // Save milk entry
         return milkEntryRepository.save(milkEntry);
     }
 
@@ -57,8 +59,6 @@ public class MilkEntryService {
     public MilkEntry addMilkEntry(
             MilkEntryRequestDTO requestDTO) {
 
-        // Fetch cow using owner name
-        // and cow name
         Cow cow = cowRepository
                 .findByCowNameAndOwnerOwnerName(
                         requestDTO.getCowName(),
@@ -67,7 +67,6 @@ public class MilkEntryService {
                         new ResourceNotFoundException(
                                 "Cow not found"));
 
-        // Build milk entry object
         MilkEntry milkEntry =
                 MilkEntry.builder()
                         .entryDate(
@@ -81,9 +80,7 @@ public class MilkEntryService {
                         .cow(cow)
                         .build();
 
-        // Save milk entry
-        return milkEntryRepository
-                .save(milkEntry);
+        return milkEntryRepository.save(milkEntry);
     }
 
     /*
@@ -94,8 +91,6 @@ public class MilkEntryService {
             String ownerName,
             MilkEntryRequestDTO requestDTO) {
 
-        // Fetch cow using owner name
-        // and cow name
         Cow cow = cowRepository
                 .findByCowNameAndOwnerOwnerName(
                         requestDTO.getCowName(),
@@ -104,13 +99,10 @@ public class MilkEntryService {
                         new ResourceNotFoundException(
                                 "Cow not found"));
 
-        // Fetch milk entries by cow id
         List<MilkEntry> milkEntries =
-                milkEntryRepository
-                        .findByCowId(
-                                cow.getId());
+                milkEntryRepository.findByCowId(
+                        cow.getId());
 
-        // Get first milk entry
         MilkEntry milkEntry =
                 milkEntries.stream()
                         .findFirst()
@@ -118,7 +110,6 @@ public class MilkEntryService {
                                 new ResourceNotFoundException(
                                         "Milk entry not found"));
 
-        // Update values
         milkEntry.setEntryDate(
                 requestDTO.getEntryDate());
 
@@ -131,9 +122,7 @@ public class MilkEntryService {
         milkEntry.setPricePerLiter(
                 requestDTO.getPricePerLiter());
 
-        // Save updated entry
-        return milkEntryRepository
-                .save(milkEntry);
+        return milkEntryRepository.save(milkEntry);
     }
 
     /*
@@ -171,7 +160,6 @@ public class MilkEntryService {
                                 startDate,
                                 endDate);
 
-        // Java 8 Stream API
         Double totalMilk =
                 milkEntries.stream()
                         .mapToDouble(
@@ -288,6 +276,7 @@ public class MilkEntryService {
                 .totalAmount(totalAmount)
                 .build();
     }
+
     /*
      * Fetch milk report
      * by owner name and dates.
@@ -304,6 +293,7 @@ public class MilkEntryService {
                         startDate,
                         endDate);
     }
+
     /*
      * Fetch monthly milk report
      * by owner name.
@@ -340,6 +330,42 @@ public class MilkEntryService {
                 .year(startDate.getYear())
                 .totalMilkLiters(totalMilk)
                 .totalAmount(totalAmount)
+                .build();
+    }
+
+    /*
+     * Fetch dashboard summary.
+     */
+    public DashboardSummaryDTO
+    getDashboardSummary() {
+
+        Long totalOwners =
+                ownerRepository.count();
+
+        Long totalCows =
+                cowRepository.count();
+
+        List<MilkEntry> milkEntries =
+                milkEntryRepository.findAll();
+
+        Double totalMilk =
+                milkEntries.stream()
+                        .mapToDouble(
+                                MilkEntry::getTotalMilk)
+                        .sum();
+
+        Double totalRevenue =
+                milkEntries.stream()
+                        .mapToDouble(
+                                MilkEntry::getTotalAmount)
+                        .sum();
+
+        return DashboardSummaryDTO
+                .builder()
+                .totalOwners(totalOwners)
+                .totalCows(totalCows)
+                .totalMilk(totalMilk)
+                .totalRevenue(totalRevenue)
                 .build();
     }
 }

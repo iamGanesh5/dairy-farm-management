@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/dairy_farm_management
     username: root
-    password: "root"
+    password: Gapnsk@5
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
