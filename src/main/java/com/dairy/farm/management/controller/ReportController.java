@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor

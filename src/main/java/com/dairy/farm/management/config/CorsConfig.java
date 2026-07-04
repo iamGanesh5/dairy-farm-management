@@ -1,45 +1,59 @@
 package com.dairy.farm.management.config;
 
 import org.springframework.context.annotation.Bean;
+
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.cors.CorsConfiguration;
 
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class CorsConfig {
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public CorsFilter corsFilter() {
 
-        return new WebMvcConfigurer() {
+        CorsConfiguration config =
+                new CorsConfiguration();
 
-            @Override
-            public void addCorsMappings(
+        /*
+         * Allow React Frontend
+         */
+        config.addAllowedOrigin(
+                "http://localhost:3000"
+        );
 
-                    CorsRegistry registry
+        config.addAllowedOrigin(
+                "http://localhost:3001"
+        );
 
-            ) {
+        /*
+         * Allow Headers
+         */
+        config.addAllowedHeader("*");
 
-                registry.addMapping("/**")
+        /*
+         * Allow Methods
+         */
+        config.addAllowedMethod("*");
 
-                        .allowedOrigins(
-                                "http://localhost:3000"
-                        )
+        /*
+         * Allow JWT/Auth
+         */
+        config.setAllowCredentials(true);
 
-                        .allowedMethods(
-                                "GET",
-                                "POST",
-                                "PUT",
-                                "DELETE"
-                        )
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
-                        .allowedHeaders("*");
+        source.registerCorsConfiguration(
+                "/**",
+                config
+        );
 
-            }
-
-        };
+        return new CorsFilter(source);
 
     }
 
